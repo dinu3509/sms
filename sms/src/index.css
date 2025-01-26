@@ -9,4 +9,6 @@
     height: 100vh; /* Adjust height as needed, for example, to fill the viewport */
   }
 
- 
+  .scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
