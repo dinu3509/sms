@@ -1,7 +1,7 @@
 import { React, useState } from 'react';
 import { zoro } from '../assets';
 import { NavLink } from 'react-router-dom';
-
+import Profilee from '../Home/Profilee';
 const Shome = () => {
 
 
@@ -33,19 +33,14 @@ const Shome = () => {
 
   return (
     <div className="min-h-screen relative">
-      <header className={`${menu?"pl-[216px]":"pl-[78px]"}  bg-[#076585] text-black h-20 flex items-center justify-center transition-all duration-300 ease-in-out`}>
-        <p className='text-center font-semibold text-white'>{activeMenu.toUpperCase()}</p>
-
-
-      </header>
-
+  
       {/* Sidebar */}
       <div
-        className={`scrollbar h-screen flex flex-col py-5 px-3  bg-gradient-to-b from-[#076585] via-[#076585] to-[#fff] top-0 absolute gap-5 items-center transition-all duration-300 ease-in-out overflow-y-scroll  ${
+        className={`fixed scrollbar h-11/12 my-10 flex flex-col py-5 px-3  bg-gradient-to-b from-[#076585] via-[#076585] to-[#fff] top-0  gap-5 left-2 items-center transition-all duration-300 ease-in-out overflow-y-scroll rounded-2xl  ${
           menu ? 'w-60' : 'w-20'
         }`}
       >
-        <div className="w-full flex justify-start">
+        <div className="w-full flex justify-center">
           <button onClick={() => setMenu(!menu)} className="text-white text-2xl">
             <span className="material-symbols-rounded">menu</span>
           </button>
@@ -89,7 +84,7 @@ const Shome = () => {
           ))}
         </ul>
       </div>
-      <main className={`${menu ? "pl-[241px]" : "pl-[80px]"} pt-5 h-208  bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364]`}>
+      <main className={`${menu ? "pl-[241px]" : "pl-[80px]"}  h-auto  bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364]`}>
         {menuItems.find((item) => item.name === activeMenu)?.component}
         
       </main>
@@ -97,8 +92,8 @@ const Shome = () => {
   );
 };
 
-const Profile = () => <div className="p-5 mt-0 m-5 h-200 text-white bg-white ">
-  <div className=""></div>
+const Profile = () => <div className=" mx-5 px-5  rounded-2xl text-white  h-40/42">
+  <div className=""><Profilee></Profilee></div>
 </div>;
 
 
