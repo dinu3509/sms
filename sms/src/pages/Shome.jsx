@@ -29,7 +29,7 @@ const Shome = () => {
   ];
   
 
-  const [menu, setMenu] = useState(true);
+  const [menu, setMenu] = useState(false);
 
   return (
     <div className="min-h-screen relative">

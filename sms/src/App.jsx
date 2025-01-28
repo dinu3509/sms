@@ -1,7 +1,9 @@
+import React,{useState} from "react";
 import { Link, Route, Routes, BrowserRouter } from "react-router-dom";
 import Login from "./pages/Login";
 import Alogin from "./pages/Alogin";
 import Shome from "./pages/Shome";
+import { UserProvider } from "./pages/UserContext";
 function App() {
   return (
     <BrowserRouter>

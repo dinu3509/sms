@@ -1,12 +1,14 @@
-import {React,useState} from 'react'
+import {React,useState,useContext} from 'react'
 import {bg} from '../assets';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import UserContext  from './UserContext';
 const Login = () => {
+  
   const [er1,setEr1] = useState("");
   const [er2,setEr2] = useState("");
   const navigate = useNavigate();
-  const [uid, setUid] = useState("");
+  const { uid, setUid } = useContext(UserContext);
   const [password, setPassword] = useState("");
   const [captcha, setCaptcha] = useState({
     a: Math.floor(Math.random() * 9)+1,
@@ -31,7 +33,9 @@ const Login = () => {
       if(res.data.message === "Success"){
           setEr2("");
           if((captcha.a + captcha.b === parseInt(e.target[3].value))){
-          navigate('/home');}else{
+          navigate('/home');
+          setUid(uid) 
+        }else{
             setEr1("Captcha is incorrect");
           }
       }else{

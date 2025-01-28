@@ -4,7 +4,7 @@ const cors = require('cors');
 
 
 const  studentModel= require('./models/Student');
-
+const sprofile = require('./models/Sprofile');
 
 const app = express();
 app.use(express.json());
@@ -33,6 +33,29 @@ app.post('/login', (req, res) => {
             }
         })
  });
+
+ app.post('/home', (req, res) => {
+    const { uid } = req.body;  // Destructure uid from the request body
+
+    console.log('Received UID:', uid);  // Log received uid to ensure it's passed correctly
+
+    if (!uid) {  // Check if uid is provided
+        return res.status(400).json({ message: "No UID provided" });
+    }
+
+    sprofile.findOne({ uid: uid })  // Search for the user by uid
+        .then(user => {
+            if (user) {
+                res.json({ message: "UID received", user });  // Respond with success if user found
+            } else {
+                res.status(404).json({ message: "No user found with the provided UID" });  // Respond with error if user not found
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: "Internal Server Error", error: err.message });  // Handle any errors from the DB
+        });
+});
 
 app.listen(3001, () => {
   console.log('Server is running on port 3001');
