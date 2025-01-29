@@ -76,7 +76,7 @@ const Shome = () => {
               key={index}
               onClick={() => setActiveMenu(item.name)}
               className={`flex items-center gap-2 text-white p-2 rounded-lg transition-all duration-300 ${
-                activeMenu === item.name ? "bg-gray-700" : "hover:bg-gray-700"
+                activeMenu === item.name ? "bg-gray-700 " : "hover:bg-gray-700"
               }`}
             >
               <span className="material-symbols-rounded">{item.icon}</span>
