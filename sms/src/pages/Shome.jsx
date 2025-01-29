@@ -2,6 +2,7 @@ import { React, useState } from 'react';
 import { zoro } from '../assets';
 import { NavLink } from 'react-router-dom';
 import Profilee from '../Home/Profilee';
+import Dashboardd from '../Home/Dashboardd';
 const Shome = () => {
 
 
@@ -32,7 +33,7 @@ const Shome = () => {
   const [menu, setMenu] = useState(false);
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative  bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364] py-10">
   
       {/* Sidebar */}
       <div
@@ -84,7 +85,7 @@ const Shome = () => {
           ))}
         </ul>
       </div>
-      <main className={`${menu ? "pl-[241px]" : "pl-[80px]"}  h-auto  bg-gradient-to-r from-[#0F2027] via-[#203A43] to-[#2C5364]`}>
+      <main className={`${menu ? "pl-[241px]" : "pl-[80px]"}  h-auto `}>
         {menuItems.find((item) => item.name === activeMenu)?.component}
         
       </main>
@@ -92,19 +93,15 @@ const Shome = () => {
   );
 };
 
-const Profile = () => <div className=" mx-5 px-5  rounded-2xl text-white  h-40/42">
+const Profile = () => <div className=" mx-5 px-5  rounded-2xl text-white  h-40/42 ">
   <div className=""><Profilee></Profilee></div>
 </div>;
 
 
+const Dashboard = () =>  <div className=" mx-5 px-5  rounded-2xl text-white  ">
+<div className=""><Dashboardd></Dashboardd></div>
+</div>;
 
-
-
-
-
-
-
-const Dashboard = () => <div className="p-5 text-white">Dashboard Content</div>;
 const Attendance = () => <div className="p-5 text-white">Attendance Content</div>;
 const AcademicTrack = () => <div className="p-5 text-white">Academic Track Content</div>;
 const Fees = () => <div className="p-5 text-white">Fees Content</div>;
