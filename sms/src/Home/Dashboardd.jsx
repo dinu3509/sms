@@ -1,36 +1,99 @@
-import React from "react";
-import { Scrollbars } from 'react-custom-scrollbars';
-
+import { React, useContext, useEffect, useState } from "react";
+import UserContext from "../pages/UserContext";
+import { Scrollbars } from "react-custom-scrollbars";
+import axios from "axios";
 import BasicDateCalendar from "../components/Calender";
+import { useId } from "react";
 const Dashboardd = () => {
-  const courses = [
-    { code: "24CSEN1081", name: "Intermediate Coding-II" },
-    {
-      code: "CLAD2031",
-      name: "Preparation For Campus Placement-2 (Soft Skills 6A)",
-    },
-    { code: "CSEN2031", name: "Artificial Intelligence" },
-    { code: "CSEN2031P", name: "Artificial Intelligence Lab" },
-    { code: "CSEN2071", name: "Cryptography and Network Security" },
-    { code: "CSEN2111", name: "Agile Software Development" },
-    { code: "CSEN3031", name: "Compiler Design" },
-    { code: "CSEN3031P", name: "Compiler Design Lab" },
-    {
-      code: "CSEN3071",
-      name: "Web Application Development and Software Frameworks",
-    },
-    {
-      code: "CSEN3071P",
-      name: "Web Application Development and Software Frameworks Lab",
-    },
-    { code: "FINA3011", name: "Financial Markets and Services" },
-    { code: "INTN2333", name: "Internship 1" },
+  const section = "dashboard";
+  const [avg, setAvg] = useState(0);
+  const [userData, setUserData] = useState([]);
+  const [userData2, setUserData2] = useState([]);
+  const [course, setCourse] = useState({});
+  const { uid, setUid, semester, setSemester } = useContext(UserContext);
+
+  useEffect(() => {
+    if (uid) {
+      console.log("1st");
+      localStorage.setItem("uid", uid);
+    }
+  }, [uid]);
+  useEffect(() => {
+    console.log("2nd");
+    const savedUid = localStorage.getItem("uid");
+    if (savedUid && !uid) {
+      setUid(savedUid);
+    }
+  }, [uid, setUid]);
+  const [fetch, setFetch] = useState(false);
+
+  useEffect(() => {
+    console.log('3rd')
+    if (uid) {
+      axios
+        .post("http://localhost:3001/home", { uid, section })
+        .then((res) => {
+          if (res.data.user) {
+            const user = res.data.user;
+            const userArray = Object.keys(user).map((key) => {
+              return { key: key, value: user[key] };
+            });
+            setUserData(userArray);
+          }
+          if (res.data.user2) {
+            const user2 = res.data.user2;
+            const userArray2 = Object.keys(user2).map((key) => {
+              return { key: key, value: user2[key] };
+            });
+            setUserData2(userArray2);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  }, [uid, setUserData]);
+console.log("out")
+  const sem = userData.find((item) => item.key === "semester")?.value;
+  const cgpaValue = userData.find((item) => item.key === "cgpa")?.value;
+
+  const sgpaValue = userData.find((item) => item.key === "sgpa")?.value[
+    Number(sem) - 2
+  ]?.value;
+  const grade = [
+    { key: "CGPA", value: cgpaValue },
+    { key: "SGPA", value: sgpaValue },
   ];
+  const today = new Date();
+  const todayName = today.toLocaleDateString("en-US", { weekday: "long" });
+  const timetable = userData.find((item) => item.key === "timetable")?.value;
+  const todayTimeTable = timetable?.[todayName] || {};
+  const timeSlots = Object.keys(todayTimeTable || {});
+  const subjects = Object.values(todayTimeTable || {});
+  useEffect(() => {
+    if (userData2 && sem) {
+      const ab = userData2.find((item) => item.key === "semesters")?.value;
+      const semCourses = ab
+        ? ab[5].courses.map((course) => course.percentage)
+        : [];
+
+      if (semCourses.length > 0) {
+        const average =
+          (semCourses.reduce((sum, num) => sum + num, 0) / (semCourses.length-1)).toFixed(2);
+        setAvg(average);
+      }
+    }
+  }, [userData2, sem]);
   return (
     <div className=" rounded-3xl">
       <div className="scrollbar bg-[#F8FAFC] h-[90vh] rounded-3xl p-7 overflow-y-scroll">
         <div className="grid grid-cols-1 grid-rows-1">
-          <div className="bg-gradient-to-r from-amber-300  to-yellow-500 p-5 text-2xl rounded-3xl">Welcome back, Dinesh Reddy! 🎓 Explore your dashboard to stay updated with classes, assignments, and announcements. Let’s make today productive!</div>
+          <div className="bg-gradient-to-r from-amber-300  to-yellow-500 p-5 text-2xl rounded-3xl">
+            Welcome back, Dinesh Reddy! 🎓 Explore your dashboard to stay
+            updated with classes, assignments, and announcements. Let’s make
+            today productive!
+            {}
+          </div>
         </div>
         <div className="h- w-full rounded-3xl flex gap-20 items-start py-3">
           <div className="grid grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-5 w-full">
@@ -42,7 +105,7 @@ const Dashboardd = () => {
                   <div className="">
                     {" "}
                     <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
-                      <span class="material-symbols-rounded">
+                      <span className="material-symbols-rounded">
                         expand_content
                       </span>
                     </button>
@@ -51,15 +114,20 @@ const Dashboardd = () => {
                 <hr></hr>
 
                 <div className="flex gap-5">
-                  {["Total", "Present", "Present"].map((item, index) => (
-                    <div
-                      key={index}
-                      className="bg-[#F2F9FF] text-center w-full py-8 rounded-2xl text-black"
-                    >
-                      {item}
-                      <div className="">100%</div>
-                    </div>
-                  ))}
+                  {[{ Total: avg }, { Present: 6 }, { Absent: 1 }].map(
+                    (item, index) => {
+                      const [key, value] = Object.entries(item)[0];
+                      return (
+                        <div
+                          key={index}
+                          className="bg-[#F2F9FF] text-center w-full py-8 rounded-2xl text-black"
+                        >
+                          <div className="">{key}</div>
+                          <div className="">{value}</div>
+                        </div>
+                      );
+                    }
+                  )}
                 </div>
               </div>
             </div>
@@ -70,7 +138,7 @@ const Dashboardd = () => {
                   <div className="">
                     {" "}
                     <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
-                      <span class="material-symbols-rounded">
+                      <span className="material-symbols-rounded">
                         expand_content
                       </span>
                     </button>
@@ -79,13 +147,13 @@ const Dashboardd = () => {
                 <hr></hr>
 
                 <div className="flex gap-5">
-                  {["CGPA", "SGPA"].map((item, index) => (
+                  {grade.map((item, index) => (
                     <div
                       key={index}
                       className="bg-[#F2F9FF] text-center w-full py-8 rounded-2xl text-black"
                     >
-                      {item}
-                      <div className="">100%</div>
+                      {item.key}
+                      <div className="">{item.value}</div>
                     </div>
                   ))}
                 </div>
@@ -97,31 +165,32 @@ const Dashboardd = () => {
                 <div className=" w-full rounded-2xl ">
                   <BasicDateCalendar></BasicDateCalendar>
                 </div>
-                <Scrollbars style={{width: '100%', height: "100%" }}>
-       
-      
-                <div className="px-3">
-                  <table className="border-collapse">
-                    <thead>
-                      <tr>
-                        <th class="border pb-2 text-gray-600">Code</th>
-                        <th class="border pb-2 text-gray-600">Course</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {courses.map((course) => (
-                        <tr key={course.code}>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.code}
-                          </td>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.name}
-                          </td>
+                <Scrollbars style={{ width: "100%", height: "100%" }}>
+                  <div className="px-3">
+                    <table className="border-collapse">
+                      <thead>
+                        <tr>
+                          <th className="border pb-2 text-gray-600">Code</th>
+                          <th className="border pb-2 text-gray-600">Course</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div></Scrollbars>
+                      </thead>
+                      <tbody>
+                        {userData
+                          .find((item) => item.key === "courses")
+                          ?.value.map((course, index) => (
+                            <tr key={course.code}>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {course.code}
+                              </td>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {course.name}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Scrollbars>
               </div>
             </div>
 
@@ -130,79 +199,81 @@ const Dashboardd = () => {
                 <div className="flex justify-between items-center">
                   <div className="">Current Semester Courses</div>
                   <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
-                    <span class="material-symbols-rounded">expand_content</span>
+                    <span className="material-symbols-rounded">
+                      expand_content
+                    </span>
                   </button>
                 </div>
                 <hr />
-                <Scrollbars style={{width: '100%', height: 300 }}>
-       
-      
-                <div className="">
-                  <table className="border-collapse">
-                    <thead>
-                      <tr>
-                        <th class="border pb-2 text-gray-600">Code</th>
-                        <th class="border pb-2 text-gray-600">Course</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {courses.map((course) => (
-                        <tr key={course.code}>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.code}
-                          </td>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.name}
-                          </td>
+                <Scrollbars style={{ width: "100%", height: 300 }}>
+                  <div className="">
+                    <table className="border-collapse">
+                      <thead>
+                        <tr>
+                          <th className="border pb-2 text-gray-600">Code</th>
+                          <th className="border pb-2 text-gray-600">Course</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div></Scrollbars>
+                      </thead>
+                      <tbody>
+                        {userData
+                          .find((item) => item.key === "courses")
+                          ?.value.map((course, index) => (
+                            <tr key={course.code}>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {course.code}
+                              </td>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {course.name}
+                              </td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Scrollbars>
               </div>
             </div>
-
-
-
 
             <div className="i5">
-
-            <div className="">
-              <div className=" h-70 rounded-2xl bg-amber-500 p-5 flex flex-col gap-5">
-                <div className="flex justify-between items-center">
-                  <div className="">Current Semester Courses</div>
-                  <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
-                    <span class="material-symbols-rounded">expand_content</span>
-                  </button>
+              <div className="">
+                <div className=" h-70 rounded-2xl bg-amber-500 p-5 flex flex-col gap-5">
+                  <div className="flex justify-between items-center">
+                    <div className="">Today's Timetable</div>
+                    <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
+                      <span className="material-symbols-rounded">
+                        expand_content
+                      </span>
+                    </button>
+                  </div>
+                  <hr />
+                  <Scrollbars style={{ width: "100%", height: 300 }}>
+                    <div className="">
+                      <table className="border-collapse w-full">
+                        <thead>
+                          <tr>
+                            <th className="border pb-2 text-gray-600">Time</th>
+                            <th className="border pb-2 text-gray-600">
+                              Course
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {timeSlots.map((item, index) => (
+                            <tr key={index}>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {item}
+                              </td>
+                              <td className="border border-gray-300 px-4 py-2 text-sm">
+                                {subjects[index]}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Scrollbars>
                 </div>
-                <hr />
-                <Scrollbars style={{width: '100%', height: 300 }}>
-       
-      
-                <div className="">
-                  <table className="border-collapse">
-                    <thead>
-                      <tr>
-                        <th class="border pb-2 text-gray-600">Code</th>
-                        <th class="border pb-2 text-gray-600">Course</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {courses.map((course) => (
-                        <tr key={course.code}>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.code}
-                          </td>
-                          <td className="border border-gray-300 px-4 py-2 text-sm">
-                            {course.name}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div></Scrollbars>
               </div>
-            </div>
             </div>
           </div>
         </div>

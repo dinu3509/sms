@@ -4,6 +4,7 @@ import UserContext from "../pages/UserContext";
 import axios from "axios";
 
 const Profilee = () => {
+  const section = "profile";
   const profile = [
     "Campus",
     "College",
@@ -37,10 +38,12 @@ const Profilee = () => {
     "Country",
     "Pincode",
   ];
+  const { semester, setSemester } = useContext(UserContext);
+  const [isDataFetched, setIsDataFetched] = useState(false);
 
   const { uid, setUid } = useContext(UserContext);
+  console.log(uid)
   const [userData, setUserData] = useState([]);
-
   useEffect(() => {
     if (uid) {
       localStorage.setItem("uid", uid);
@@ -56,7 +59,7 @@ const Profilee = () => {
   useEffect(() => {
     if (uid) {
       axios
-        .post("http://localhost:3001/home", { uid })
+        .post("http://localhost:3001/home", { uid, section })
         .then((res) => {
           if (res.data.user) {
             const user = res.data.user;
@@ -66,7 +69,6 @@ const Profilee = () => {
             });
 
             setUserData(userArray);
-
             console.log(userArray);
           }
         })
@@ -75,6 +77,22 @@ const Profilee = () => {
         });
     }
   }, [uid]);
+
+  
+{/**
+  useEffect(() => {
+    if (userData.length > 0) {
+      const semesterValue = userData.find(
+        (item) => item.key === "semester"
+      )?.value;
+      if (semesterValue) {
+        const updatedSemester = Number(semesterValue) - 1;
+        setSemester(updatedSemester);
+        localStorage.setItem("semester", updatedSemester); // Store semester value
+        console.log("Updated semester:", updatedSemester);
+      }
+    }
+  }, [userData, setSemester]); */}
 
   return (
     <>
@@ -124,7 +142,10 @@ const Profilee = () => {
           </div>
           <div className="relative grid lg:grid-cols-5 md:grid-cols-4 gap-5 gap-y-12 sm:grid-cols-2">
             {personal.map((label, index) => (
-              <div className="border p-1 rounded-lg relative bg-gray-700">
+              <div
+                key={index}
+                className="border p-1 rounded-lg relative bg-gray-700"
+              >
                 {
                   userData.find((item) => item.key === label.toLowerCase())
                     ?.value
@@ -143,7 +164,10 @@ const Profilee = () => {
           </div>
           <div className="relative grid lg:grid-cols-5 md:grid-cols-4 gap-5 gap-y-12 sm:grid-cols-2">
             {address.map((label, index) => (
-              <div className="border p-1 rounded-lg relative bg-gray-700">
+              <div
+                key={index}
+                className="border p-1 rounded-lg relative bg-gray-700"
+              >
                 {
                   userData.find((item) => item.key === label.toLowerCase())
                     ?.value

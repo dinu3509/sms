@@ -3,10 +3,11 @@ import { zoro } from '../assets';
 import { NavLink } from 'react-router-dom';
 import Profilee from '../Home/Profilee';
 import Dashboardd from '../Home/Dashboardd';
+import Attendancee from '../Home/Attendancee';
 const Shome = () => {
 
 
-  const [activeMenu, setActiveMenu] = useState("Dashboard");
+  const [activeMenu, setActiveMenu] = useState("Profile");
 
   const menuItems = [
     { name: "Profile", icon: "person", component: <Profile /> },
@@ -102,7 +103,7 @@ const Dashboard = () =>  <div className=" mx-5 px-5  rounded-2xl text-white  ">
 <div className=""><Dashboardd></Dashboardd></div>
 </div>;
 
-const Attendance = () => <div className="p-5 text-white">Attendance Content</div>;
+const Attendance = () => <div className="p-5 text-white"><Attendancee></Attendancee></div>;
 const AcademicTrack = () => <div className="p-5 text-white">Academic Track Content</div>;
 const Fees = () => <div className="p-5 text-white">Fees Content</div>;
 const MentorDetails = () => <div className="p-5 text-white">Mentor Details Content</div>;

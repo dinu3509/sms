@@ -2,8 +2,10 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
+const dashBoardModel = require("./models/dashboard");
 const studentModel = require("./models/Student");
 const sprofile = require("./models/Sprofile");
+const csModel = require("./models/courseStructure");
 
 const app = express();
 app.use(express.json());
@@ -32,32 +34,60 @@ app.post("/login", (req, res) => {
 });
 
 app.post("/home", (req, res) => {
-  const { uid } = req.body; // Destructure uid from the request body
+  const { uid, section } = req.body;
 
-  console.log("Received UID:", uid); // Log received uid to ensure it's passed correctly
-
-  if (!uid) {
-    // Check if uid is provided
-    return res.status(400).json({ message: "No UID provided" });
+  if (section === "profile") {
+    sprofile
+      .findOne({ uid: uid })
+      .then((user) => {
+        if (user) {
+          res.json({ message: "UID received", user });
+        } else {
+          res.status(404).json({ message: "No user found with the provided UID" });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+      });
+  } else  if (section === "dashboard") {
+    // Query to find user in dashBoardModel
+    dashBoardModel
+      .findOne({ uid: uid })
+      .then((user) => {
+        if (user) {
+          // If user is found, query the second model (csModel)
+          csModel
+            .findOne({ uid: uid })
+            .then((user2) => {
+              if (user2) {
+                // Both user and user2 found, send both in the response
+                res.json({ message: "UID received", user, user2 });
+              } else {
+                // If user2 is not found
+                res.status(404).json({ message: "No user2 found with the provided UID" });
+              }
+            })
+            .catch((err) => {
+              // If there is an error in finding user2
+              console.error(err);
+              res.status(500).json({ message: "Internal Server Error", error: err.message });
+            });
+        } else {
+          // If user is not found
+          res.status(404).json({ message: "No user found with the provided UID" });
+        }
+      })
+      .catch((err) => {
+        // If there is an error in finding user
+        console.error(err);
+        res.status(500).json({ message: "Internal Server Error", error: err.message });
+      });
+  } else {
+    // If section is not "dashboard", you can handle other cases here or send a default response
+    
+    res.status(400).json({ message: "Invalid section" });
   }
-
-  sprofile
-    .findOne({ uid: uid }) // Search for the user by uid
-    .then((user) => {
-      if (user) {
-        res.json({ message: "UID received", user }); // Respond with success if user found
-      } else {
-        res
-          .status(404)
-          .json({ message: "No user found with the provided UID" }); // Respond with error if user not found
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(500)
-        .json({ message: "Internal Server Error", error: err.message }); // Handle any errors from the DB
-    });
 });
 
 app.listen(3001, () => {
