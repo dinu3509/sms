@@ -8,17 +8,13 @@ const sprofile = require("./models/Sprofile");
 const csModel = require("./models/courseStructure");
 
 const app = express();
-const allowedOrigins = ['https://school-1rzs.vercel.app'];
+const allowedOrigins = ["https://school-1rzs.vercel.app"];
 
 app.use(
   cors({
-    origin: function (origin, callback) {
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true); // Allow the request if the origin matches
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    }
+    origin: ["*"],
+    methods: ["POST", "GET"],
+    credentials: true,
   })
 );
 
