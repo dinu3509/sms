@@ -27,7 +27,7 @@ const Alogin = () => {
       }else{setEr1("");}
       console.log(uid, password );
   
-      axios.post("http://localhost:3001/login", {uid, password})
+      axios.post("https://school-server-nine-pi.vercel.app/", {uid, password})
       .then((res) => { console.log(res);
         if(res.data.message === "Success"){
             setEr2("");

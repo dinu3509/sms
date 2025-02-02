@@ -32,7 +32,7 @@ const Dashboardd = () => {
       hasFetched.current = true; // Prevent multiple API calls
 
       axios
-        .post("http://localhost:3001/home", { uid, section })
+        .post("https://school-server-nine-pi.vercel.app/home", { uid, section })
         .then((res) => {
           if (res.data.user) {
             const user = res.data.user;
