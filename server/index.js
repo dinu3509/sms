@@ -19,7 +19,7 @@ mongoose
   .then(() => console.log("Connected to MongoDB Atlas"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
-app.post("/login", async (req, res) => {
+app.post("/", async (req, res) => {
   const { uid, password } = req.body;
   try {
     const user = await studentModel.findOne({ uid });
