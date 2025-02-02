@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+.main {
+    /*background-image: url("mbg.jpg");*/
+    background-color: #09122C;
+    background-size: cover; /* Makes the image cover the entire container */
+    background-position: center; /* Centers the image */
+    background-repeat: no-repeat; /* Prevents the image from repeating */
+    height: 100vh; /* Adjust height as needed, for example, to fill the viewport */
+  }
+
+  .scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+  }
