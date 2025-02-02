@@ -15,8 +15,20 @@ const corsConfig = {
   credentials: true,
   method: ["GET", "POST", "PUT", "DELETE"],
 };
-app.use(cors(corsConfig));
-
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (allowedOrigins.includes(origin) || !origin) {
+        // allowing non-origin requests (like Postman)
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    methods: ["POST", "GET"],
+    credentials: true, // Ensuring that credentials like cookies are allowed
+  })
+);
 mongoose.connect(
   "mongodb+srv://dinu3509:diNesh%400@cluster0.duykm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
 );
@@ -109,10 +121,6 @@ app.post("/home", (req, res) => {
   }
 });
 
-app.listen(process.env.PORT, () => {
-  try {
-    console.log(`Server is running on port ${process.env.PORT}`);
-  } catch (error) {
-    console.log(error);
-  }
+app.listen(3001, () => {
+  console.log("Server is running on port 3001");
 });
