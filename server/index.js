@@ -32,7 +32,7 @@ app.get("/", (req, res) => {
   res.json("Hi Dinesh Reddy");
 });
 
-app.post("/login", (req, res) => {
+app.post("/", (req, res) => {
   const { uid, password } = req.body;
   studentModel.findOne({ uid: uid }).then((user) => {
     if (user) {
