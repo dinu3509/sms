@@ -28,7 +28,7 @@ const Login = () => {
     }else{setEr1("");}
     console.log(uid, password );
 
-    axios.post("http://localhost:3001/", {uid, password})
+    axios.post("http://localhost:3001/login", {uid, password})
     .then((res) => { console.log(res);
       if(res.data.message === "Success"){
           setEr2("");

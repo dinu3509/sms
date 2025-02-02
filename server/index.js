@@ -9,48 +9,106 @@ const csModel = require("./models/courseStructure");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://school-server-nine-pi.vercel.app"],
+    methods: ["POST", "GET"],
+    credentials: true,
+  })
+);
 
-// Use Environment Variables for MongoDB URI
-const mongoURI = process.env.MONGO_URI || "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh";
+mongoose.connect(
+  "mongodb+srv://dinu3509:diNesh%400@cluster0.duykm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+);
+/**mongodb+srv://dinu3509:diNesh%400@cluster0.duykm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0 */
+app.get("/", (req, res) => {
+  res.json("Hi Dinesh Reddy");
+});
 
-mongoose
-  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("Connected to MongoDB Atlas"))
-  .catch((err) => console.error("MongoDB Connection Error:", err));
-
-app.post("/", async (req, res) => {
+app.post("/login", (req, res) => {
   const { uid, password } = req.body;
-  try {
-    const user = await studentModel.findOne({ uid });
+  studentModel.findOne({ uid: uid }).then((user) => {
     if (user) {
-      return res.json({ message: user.password === password ? "Success" : "Password Incorrect" });
+      if (user.password === password) {
+        res.json({ message: "Success" });
+      } else {
+        res.json({ message: "Password Incorrect" });
+      }
+    } else {
+      res.json("No record Existed");
     }
-    res.status(404).json({ message: "No record Existed" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
-  }
+  });
 });
 
-app.post("/home", async (req, res) => {
+app.post("/home", (req, res) => {
   const { uid, section } = req.body;
-  try {
-    if (section === "profile") {
-      const user = await sprofile.findOne({ uid });
-      return user ? res.json({ message: "UID received", user }) : res.status(404).json({ message: "No user found" });
-    }
-    if (section === "dashboard") {
-      const user = await dashBoardModel.findOne({ uid });
-      if (!user) return res.status(404).json({ message: "No user found" });
 
-      const user2 = await csModel.findOne({ uid });
-      return user2 ? res.json({ message: "UID received", user, user2 }) : res.status(404).json({ message: "No user2 found" });
-    }
+  if (section === "profile") {
+    sprofile
+      .findOne({ uid: uid })
+      .then((user) => {
+        if (user) {
+          res.json({ message: "UID received", user });
+        } else {
+          res
+            .status(404)
+            .json({ message: "No user found with the provided UID" });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        res
+          .status(500)
+          .json({ message: "Internal Server Error", error: err.message });
+      });
+  } else if (section === "dashboard") {
+    // Query to find user in dashBoardModel
+    dashBoardModel
+      .findOne({ uid: uid })
+      .then((user) => {
+        if (user) {
+          // If user is found, query the second model (csModel)
+          csModel
+            .findOne({ uid: uid })
+            .then((user2) => {
+              if (user2) {
+                // Both user and user2 found, send both in the response
+                res.json({ message: "UID received", user, user2 });
+              } else {
+                // If user2 is not found
+                res
+                  .status(404)
+                  .json({ message: "No user2 found with the provided UID" });
+              }
+            })
+            .catch((err) => {
+              // If there is an error in finding user2
+              console.error(err);
+              res
+                .status(500)
+                .json({ message: "Internal Server Error", error: err.message });
+            });
+        } else {
+          // If user is not found
+          res
+            .status(404)
+            .json({ message: "No user found with the provided UID" });
+        }
+      })
+      .catch((err) => {
+        // If there is an error in finding user
+        console.error(err);
+        res
+          .status(500)
+          .json({ message: "Internal Server Error", error: err.message });
+      });
+  } else {
+    // If section is not "dashboard", you can handle other cases here or send a default response
+
     res.status(400).json({ message: "Invalid section" });
-  } catch (error) {
-    res.status(500).json({ error: error.message });
   }
 });
 
-// Vercel does not support app.listen(), so export the app
-module.exports = app;
+app.listen(3001, () => {
+  console.log("Server is running on port 3001");
+});
