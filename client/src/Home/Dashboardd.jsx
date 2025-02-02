@@ -1,65 +1,66 @@
-import { React, useContext, useEffect, useState } from "react";
+import { React, useContext, useEffect, useState, useRef } from "react";
 import UserContext from "../pages/UserContext";
 import { Scrollbars } from "react-custom-scrollbars";
-import axios from "axios";
 import BasicDateCalendar from "../components/Calender";
-import { useId } from "react";
+import axios from "axios";
+
 const Dashboardd = () => {
   const section = "dashboard";
   const [avg, setAvg] = useState(0);
   const [userData, setUserData] = useState([]);
   const [userData2, setUserData2] = useState([]);
-  const [course, setCourse] = useState({});
-  const { uid, setUid, semester, setSemester } = useContext(UserContext);
+  const { uid, setUid } = useContext(UserContext);
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (uid) {
-      console.log("1st");
-      localStorage.setItem("uid", uid);
-    }
-  }, [uid]);
-  useEffect(() => {
-    console.log("2nd");
     const savedUid = localStorage.getItem("uid");
     if (savedUid && !uid) {
       setUid(savedUid);
     }
   }, [uid, setUid]);
-  const [fetch, setFetch] = useState(false);
 
   useEffect(() => {
-    console.log('3rd')
-    if (uid) {
+    const savedUserData = localStorage.getItem("userData");
+    const savedUserData2 = localStorage.getItem("userData2");
+
+    if (savedUserData) setUserData(JSON.parse(savedUserData));
+    if (savedUserData2) setUserData2(JSON.parse(savedUserData2));
+  }, []);
+
+  useEffect(() => {
+    if (uid && !hasFetched.current && userData.length === 0) {
+      hasFetched.current = true; // Prevent multiple API calls
+
       axios
         .post("http://localhost:3001/home", { uid, section })
         .then((res) => {
           if (res.data.user) {
             const user = res.data.user;
-            const userArray = Object.keys(user).map((key) => {
-              return { key: key, value: user[key] };
-            });
+            const userArray = Object.keys(user).map((key) => ({
+              key: key,
+              value: user[key],
+            }));
             setUserData(userArray);
+            localStorage.setItem("userData", JSON.stringify(userArray)); // ✅ Store in localStorage
           }
           if (res.data.user2) {
             const user2 = res.data.user2;
-            const userArray2 = Object.keys(user2).map((key) => {
-              return { key: key, value: user2[key] };
-            });
+            const userArray2 = Object.keys(user2).map((key) => ({
+              key: key,
+              value: user2[key],
+            }));
             setUserData2(userArray2);
+            localStorage.setItem("userData2", JSON.stringify(userArray2)); // ✅ Store in localStorage
           }
         })
-        .catch((err) => {
-          console.log(err);
-        });
+        .catch((err) => console.log(err));
     }
-  }, [uid, setUserData]);
-console.log("out")
+  }, [uid]);
+
   const sem = userData.find((item) => item.key === "semester")?.value;
   const cgpaValue = userData.find((item) => item.key === "cgpa")?.value;
+  const sgpaValue = userData.find((item) => item.key === "sgpa")?.value?.[Number(sem) - 2]?.value;
 
-  const sgpaValue = userData.find((item) => item.key === "sgpa")?.value[
-    Number(sem) - 2
-  ]?.value;
   const grade = [
     { key: "CGPA", value: cgpaValue },
     { key: "SGPA", value: sgpaValue },
@@ -70,33 +71,37 @@ console.log("out")
   const todayTimeTable = timetable?.[todayName] || {};
   const timeSlots = Object.keys(todayTimeTable || {});
   const subjects = Object.values(todayTimeTable || {});
+
   useEffect(() => {
-    if (userData2 && sem) {
+    if (userData2.length > 0 && sem) {
       const ab = userData2.find((item) => item.key === "semesters")?.value;
-      const semCourses = ab
-        ? ab[5].courses.map((course) => course.percentage)
-        : [];
+      const semCourses = ab ? ab[5]?.courses.map((course) => course.percentage) : [];
 
       if (semCourses.length > 0) {
-        const average =
-          (semCourses.reduce((sum, num) => sum + num, 0) / (semCourses.length-1)).toFixed(2);
+        const average = (
+          semCourses.reduce((sum, num) => sum + num, 0) / semCourses.length
+        ).toFixed(2);
         setAvg(average);
       }
     }
   }, [userData2, sem]);
+
+
+
   return (
     <div className=" rounded-3xl">
       <div className="scrollbar bg-[#F8FAFC] h-[90vh] rounded-3xl p-7 overflow-y-scroll">
         <div className="grid grid-cols-1 grid-rows-1">
-          <div className="bg-gradient-to-r from-amber-300  to-yellow-500 p-5 text-2xl rounded-3xl">
-            Welcome back, Dinesh Reddy! 🎓 Explore your dashboard to stay
-            updated with classes, assignments, and announcements. Let’s make
-            today productive!
+          <div className="bg-gradient-to-r from-amber-300  to-yellow-500 p-5 md:text-2xl rounded-3xl">
+            Welcome back,
+            {` ${userData.find((item) => item.key === "name")?.value}`}! 🎓
+            Explore your dashboard to stay updated with classes, assignments,
+            and announcements. Let’s make today productive!
             {}
           </div>
         </div>
         <div className="h- w-full rounded-3xl flex gap-20 items-start py-3">
-          <div className="grid grid-cols-2 lg:grid-cols-3 grid-rows-2 gap-5 w-full">
+          <div className="grid   md:grid-cols-2 lg:grid-cols-3 md:grid-rows-2 gap-5 w-full">
             <div className="i1">
               {" "}
               <div className="flex gap-5 bg-amber-500 p-5 rounded-3xl relative flex-col">
@@ -159,7 +164,7 @@ console.log("out")
                 </div>
               </div>
             </div>
-            <div className="i3 row-span-2 h-full rounded-2xl bg-sky-300">
+            <div className="i3 md:row-span-2 hidden md:block rounded-2xl bg-sky-300 ">
               {" "}
               <div className=" rounded-2xl overflow-hidden h-full flex flex-col gap-5 justify-center items-center ">
                 <div className=" w-full rounded-2xl ">

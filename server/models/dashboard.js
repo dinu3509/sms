@@ -18,6 +18,7 @@ const dashBoard = new mongoose.Schema({
       name: { type: String, required: true },
     },
   ],
+  name: { type: String },
 });
 
 const dashBoardModel = mongoose.model("DashBoard", dashBoard);

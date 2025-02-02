@@ -11,7 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-mongoose.connect("mongodb://localhost:27017/dinesh");
+mongoose.connect(
+  "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh"
+);
 
 /*app.post('/login', (req, res) => {
         studentModel.create(req.body)
@@ -43,14 +45,18 @@ app.post("/home", (req, res) => {
         if (user) {
           res.json({ message: "UID received", user });
         } else {
-          res.status(404).json({ message: "No user found with the provided UID" });
+          res
+            .status(404)
+            .json({ message: "No user found with the provided UID" });
         }
       })
       .catch((err) => {
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        res
+          .status(500)
+          .json({ message: "Internal Server Error", error: err.message });
       });
-  } else  if (section === "dashboard") {
+  } else if (section === "dashboard") {
     // Query to find user in dashBoardModel
     dashBoardModel
       .findOne({ uid: uid })
@@ -65,27 +71,35 @@ app.post("/home", (req, res) => {
                 res.json({ message: "UID received", user, user2 });
               } else {
                 // If user2 is not found
-                res.status(404).json({ message: "No user2 found with the provided UID" });
+                res
+                  .status(404)
+                  .json({ message: "No user2 found with the provided UID" });
               }
             })
             .catch((err) => {
               // If there is an error in finding user2
               console.error(err);
-              res.status(500).json({ message: "Internal Server Error", error: err.message });
+              res
+                .status(500)
+                .json({ message: "Internal Server Error", error: err.message });
             });
         } else {
           // If user is not found
-          res.status(404).json({ message: "No user found with the provided UID" });
+          res
+            .status(404)
+            .json({ message: "No user found with the provided UID" });
         }
       })
       .catch((err) => {
         // If there is an error in finding user
         console.error(err);
-        res.status(500).json({ message: "Internal Server Error", error: err.message });
+        res
+          .status(500)
+          .json({ message: "Internal Server Error", error: err.message });
       });
   } else {
     // If section is not "dashboard", you can handle other cases here or send a default response
-    
+
     res.status(400).json({ message: "Invalid section" });
   }
 });
