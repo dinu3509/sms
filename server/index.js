@@ -8,43 +8,42 @@ const sprofile = require("./models/Sprofile");
 const csModel = require("./models/courseStructure");
 
 const app = express();
-const allowedOrigins = ["https://school-1rzs.vercel.app"];
 
-app.use(express.json());
+// ✅ Middleware for CORS and JSON parsing
+const corsOptions = {
+  origin: ["https://school-1rzs.vercel.app"], // Add your frontend URL
+  methods: "GET,POST",
+  allowedHeaders: "Content-Type",
+};
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (allowedOrigins.includes(origin) || !origin) {
-        // Allow requests from your frontend
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"], // Add any custom headers your frontend uses
-    credentials: true, // Allow cookies if needed
-  })
-);
+app.use(cors(corsOptions));
 
+app.use(express.json()); // ✅ This allows parsing of JSON request bodies
+// ✅ If form data is sent
+
+// ✅ MongoDB Connection
 mongoose
   .connect(
-    "mongodb+srv://dinu3509:diNesh%4005cluster0.duykm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh"
   )
-  .then(() => console.log("MongoDB Connected"))
+  .then(() => console.log("MongoDB Connected ✅"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
 
+// ✅ Root route
 app.get("/", (req, res) => {
   res.json("Hi Dinesh Reddy");
 });
 
-app.post("/", async (req, res) => {
+// ✅ Login Route
+app.post("/login", async (req, res) => {
   try {
+    console.log("Received Body:", req.body); // 🔴 Debugging only
+
     const { uid, password } = req.body;
 
-    console.log("Received UID:", uid);
-    console.log("Received Password:", password); // 🔴 Debugging Only
+    if (!uid || !password) {
+      return res.status(400).json({ message: "Missing uid or password" });
+    }
 
     // Fetch user from MongoDB
     const user = await studentModel.findOne({ uid });
@@ -54,53 +53,58 @@ app.post("/", async (req, res) => {
       return res.status(404).json({ message: "No record existed" });
     }
 
-    console.log("Stored Password in DB:", user.password); // 🔴 Debugging Only
-
     if (user.password === password) {
-      console.log("✅ Password Matched!");
+      console.log("Password Matched ✅");
       return res.json({ message: "Success" });
     } else {
-      console.log("❌ Password Incorrect!");
-      return res.json({
-        message: "Password Incorrect",
-        storedPassword: user.password, // Password stored in DB
-        receivedPassword: password, // Password received in the request
-      });
+      console.log("Password Incorrect ❌");
+      return res.status(401).json({ message: "Password Incorrect" });
     }
   } catch (err) {
-    console.error("🚨 Error during login:", err);
+    console.error("Error during login:", err);
     res
       .status(500)
       .json({ message: "Internal Server Error", error: err.message });
   }
 });
-app.post("/home", (req, res) => {
+
+// ✅ Home Route
+app.post("/home", async (req, res) => {
   try {
+    console.log("Received Home Request:", req.body); // 🔴 Debugging only
+
     const { uid, section } = req.body;
+
+    if (!uid || !section) {
+      return res.status(400).json({ message: "Missing uid or section" });
+    }
+
     if (section === "profile") {
-      const user = sprofile.findOne({ uid });
+      const user = await sprofile.findOne({ uid });
       return user
-        ? res.json({ message: "UID received", user })
+        ? res.json({ message: "Profile found", user })
         : res.status(404).json({ message: "No user found" });
     }
+
     if (section === "dashboard") {
-      const user = dashBoardModel.findOne({ uid });
+      const user = await dashBoardModel.findOne({ uid });
       if (!user) return res.status(404).json({ message: "No user found" });
-      const user2 = csModel.findOne({ uid });
+
+      const user2 = await csModel.findOne({ uid });
       return user2
-        ? res.json({ message: "UID received", user, user2 })
+        ? res.json({ message: "Dashboard found", user, user2 })
         : res.status(404).json({ message: "No user2 found" });
     }
+
     res.status(400).json({ message: "Invalid section" });
   } catch (err) {
     console.error("Error during home section fetch:", err);
     res
       .status(500)
-      .json({ message: "Internal Server Error 2", error: err.message });
+      .json({ message: "Internal Server Error", error: err.message });
   }
 });
 
-const port = process.env.PORT || 3001;
-app.listen(port, () => console.log(`Server running on port ${port}`));
-
-module.exports = app;
+// ✅ Server Setup
+const port = 3001;
+app.listen(port, () => console.log(`🚀 Server running on port ${port}`));

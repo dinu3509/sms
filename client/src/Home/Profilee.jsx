@@ -42,7 +42,7 @@ const Profilee = () => {
   const [isDataFetched, setIsDataFetched] = useState(false);
 
   const { uid, setUid } = useContext(UserContext);
-  console.log(uid)
+  console.log(uid);
   const [userData, setUserData] = useState([]);
   useEffect(() => {
     if (uid) {
@@ -59,7 +59,7 @@ const Profilee = () => {
   useEffect(() => {
     if (uid) {
       axios
-        .post("http://localhost:3001/home", { uid, section })
+        .post("https://school-server-nine-pi.vercel.app/home", { uid, section })
         .then((res) => {
           if (res.data.user) {
             const user = res.data.user;
@@ -78,8 +78,8 @@ const Profilee = () => {
     }
   }, [uid]);
 
-  
-{/**
+  {
+    /**
   useEffect(() => {
     if (userData.length > 0) {
       const semesterValue = userData.find(
@@ -92,7 +92,8 @@ const Profilee = () => {
         console.log("Updated semester:", updatedSemester);
       }
     }
-  }, [userData, setSemester]); */}
+  }, [userData, setSemester]); */
+  }
 
   return (
     <>
