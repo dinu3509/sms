@@ -30,8 +30,7 @@ app.use(
 
 mongoose
   .connect(
-    process.env.MONGO_URI ||
-      "mongodb+srv://dinu3509:diNesh%400@cluster0.duykm.mongodb.net/yourDatabaseName?retryWrites=true&w=majority&appName=Cluster0"
+    "mongodb+srv://dinu3509:diNesh%4005cluster0.duykm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
   )
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("MongoDB Connection Error:", err));
@@ -40,22 +39,41 @@ app.get("/", (req, res) => {
   res.json("Hi Dinesh Reddy");
 });
 
-app.post("/", (req, res) => {
+app.post("/", async (req, res) => {
   try {
     const { uid, password } = req.body;
-    const user = studentModel.findOne({ uid });
-    if (!user) return res.status(404).json({ message: "No record existed" });
-    res.json({
-      message: user.password === password ? "Success" : "Password Incorrect",
-    });
+
+    console.log("Received UID:", uid);
+    console.log("Received Password:", password); // 🔴 Debugging Only
+
+    // Fetch user from MongoDB
+    const user = await studentModel.findOne({ uid });
+
+    if (!user) {
+      console.log("User not found for UID:", uid);
+      return res.status(404).json({ message: "No record existed" });
+    }
+
+    console.log("Stored Password in DB:", user.password); // 🔴 Debugging Only
+
+    if (user.password === password) {
+      console.log("✅ Password Matched!");
+      return res.json({ message: "Success" });
+    } else {
+      console.log("❌ Password Incorrect!");
+      return res.json({
+        message: "Password Incorrect",
+        storedPassword: user.password, // Password stored in DB
+        receivedPassword: password, // Password received in the request
+      });
+    }
   } catch (err) {
-    console.error("Error during login:", err);
+    console.error("🚨 Error during login:", err);
     res
       .status(500)
-      .json({ message: "Internal Server Error 1", error: err.message });
+      .json({ message: "Internal Server Error", error: err.message });
   }
 });
-
 app.post("/home", (req, res) => {
   try {
     const { uid, section } = req.body;
