@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="https://school-1rzs.vercel.app/login" element={<Login />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/alogin" element={<Alogin />} />
         <Route path="/home" element={<Shome />} />
       </Routes>
