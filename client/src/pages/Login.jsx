@@ -28,7 +28,7 @@ const Login = () => {
     }else{setEr1("");}
     console.log(uid, password );
 
-    axios.post("https://school-server-nine-pi.vercel.app/", {uid, password})
+    axios.post("https://school-server-nine-pi.vercel.app/", { uid, password }, { mode: "cors" })
     .then((res) => { console.log(res);
       if(res.data.message === "Success"){
           setEr2("");
