@@ -13,18 +13,19 @@ const app = express();
 // ✅ Middleware for CORS and JSON parsing
 const corsOptions = {
   origin: "https://school-1rzs.vercel.app", // Allow all paths from this domain
-  methods: "GET,POST",
-  allowedHeaders: "Content-Type",
+  credential: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
 };
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
+
+
 app.use(express.json()); // ✅ This allows parsing of JSON request bodies
 
 // ✅ MongoDB Connection
 mongoose.connect(
-  "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh"
-)
-.then(() => console.log("MongoDB Connected ✅"))
-.catch((err) => console.error("MongoDB Connection Error:", err));
+  "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh?retryWrites=true&w=majority&appName=Cluster0"
+);
 
 // ✅ Root route
 app.get("/", (req, res) => {
@@ -59,7 +60,9 @@ app.post("/login", async (req, res) => {
     }
   } catch (err) {
     console.error("Error during login:", err);
-    res.status(500).json({ message: "Internal Server Error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
   }
 });
 
@@ -94,19 +97,9 @@ app.post("/home", async (req, res) => {
     res.status(400).json({ message: "Invalid section" });
   } catch (err) {
     console.error("Error during home section fetch:", err);
-    res.status(500).json({ message: "Internal Server Error", error: err.message });
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: err.message });
   }
 });
-const port = process.env.PORT || 3001; // Use the environment's PORT or fallback to 3001
-app.listen(port, () => {
-  console.log(`🚀 Server running on http://localhost:${port}`);
-});
-// Handle the Express app and Vercel serverless integration
-module.exports = (req, res) => {
-  connectDb()
-    .then(() => app(req, res)) // Process the request using the Express app
-    .catch((err) => {
-      console.error("MongoDB connection error:", err);
-      res.status(500).json({ message: "Internal Server Error" });
-    });
-};
+module.exports = app;
