@@ -30,26 +30,28 @@ const Login = () => {
     console.log(uid, password);
 
     axios
-      .post("https://school-server-nine-pi.vercel.app/login", { uid, password })
-
-      .then((res) => {
-        console.log(res);
-        if (res.data.message === "Success") {
-          setEr2("");
-          if (captcha.a + captcha.b === parseInt(e.target[3].value)) {
-            navigate("/home");
-            setUid(uid);
-          } else {
-            setEr1("Captcha is incorrect");
-          }
+    .post("https://school-server-nine-pi.vercel.app/login", { uid, password })
+    .then((res) => {
+      console.log("Full Response:", res.data); // 🔴 Debugging
+  
+      if (res.data && res.data.message === "Success") {
+        setEr2("");
+        if (captcha.a + captcha.b === parseInt(e.target[3].value)) {
+          navigate("/home");
+          setUid(uid);
         } else {
-          console.log("error");
-          setEr2("Invalid Credentials");
+          setEr1("Captcha is incorrect");
         }
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+      } else {
+        console.log("Error - Invalid Credentials ❌");
+        setEr2("Invalid Credentials");
+      }
+    })
+    .catch((err) => {
+      console.error("Axios Error:", err);
+      setEr2("Network or Server Error");
+    });
+  
   };
 
   return (
