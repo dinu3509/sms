@@ -32,7 +32,7 @@ const Login = () => {
     axios
     .post("https://school-server-nine-pi.vercel.app/login", { uid, password })
     .then((res) => {
-      console.log("Full Response:", res.data); // 🔴 Debugging
+      console.log("Full Response:", res.data); 
   
       if (res.data && res.data.message === "Success") {
         setEr2("");
@@ -49,7 +49,7 @@ const Login = () => {
     })
     .catch((err) => {
       console.error("Axios Error:", err);
-      setEr2("Network or Server Error");
+      setEr2("Invalid Credentials");
     });
   
   };
