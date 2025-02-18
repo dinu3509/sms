@@ -12,3 +12,10 @@
   .scrollbar::-webkit-scrollbar {
     display: none; /* Chrome, Safari */
   }
+  .attendnceTable th,
+  .attendnceTable td {
+      border: 1px solid white;
+      padding: 8px; /* Optional: Adjust padding */
+      text-align: left; /* Optional: Adjust text alignment */
+  }
+  

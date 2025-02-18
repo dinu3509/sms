@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 
-// Import models
 const dashBoardModel = require("../models/dashboard");
 const studentModel = require("../models/Student");
 const sprofile = require("../models/Sprofile");
@@ -10,29 +9,19 @@ const csModel = require("../models/courseStructure");
 
 const app = express();
 
-// ✅ Middleware for CORS and JSON parsing
-const corsOptions = {
-  origin: "https://school-1rzs.vercel.app", // Allow all paths from this domain
-  credential: true,
-  methods: ["GET", "POST", "PUT", "DELETE"],
-};
-app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
+app.use(cors()); // ✅ This enables CORS
 
 
-app.use(express.json()); // ✅ This allows parsing of JSON request bodies
-
-// ✅ MongoDB Connection
 mongoose.connect(
   "mongodb+srv://dinu3509:diNesh%4005@cluster0.duykm.mongodb.net/dinesh?retryWrites=true&w=majority&appName=Cluster0"
 );
-
+ // ✅ Middleware to parse JSON body
+ app.use(express.json());
 // ✅ Root route
 app.get("/", (req, res) => {
   res.json("Hi Dinesh Reddy");
 });
 
-// ✅ Login Route
 app.post("/login", async (req, res) => {
   try {
     console.log("Received Body:", req.body); // 🔴 Debugging only
@@ -94,6 +83,14 @@ app.post("/home", async (req, res) => {
         : res.status(404).json({ message: "No user2 found" });
     }
 
+    if(section === "attendance"){
+      const user = await csModel.findOne({uid});
+      if(!user){ return res.status(404).json({message:"No user FOund"})}
+      return user 
+      ?res.json({message:"Details Found",user})
+      : res.status(404).json({message:"No user found"})
+    }
+
     res.status(400).json({ message: "Invalid section" });
   } catch (err) {
     console.error("Error during home section fetch:", err);
@@ -102,4 +99,5 @@ app.post("/home", async (req, res) => {
       .json({ message: "Internal Server Error", error: err.message });
   }
 });
-module.exports = app;
+app.listen(3000, () => console.log("Server running on port 3000"));
+

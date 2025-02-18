@@ -30,7 +30,7 @@ const Login = () => {
     console.log(uid, password);
 
     axios
-    .post("https://school-server-nine-pi.vercel.app/login", { uid, password })
+    .post("http://localhost:3000/login", { uid, password })
     .then((res) => {
       console.log("Full Response:", res.data); 
   

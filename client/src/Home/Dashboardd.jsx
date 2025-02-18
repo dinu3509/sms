@@ -5,6 +5,7 @@ import axios from "axios";
 import { Scrollbars } from 'react-custom-scrollbars-2';
 
 const Dashboardd = () => {
+  
   const section = "dashboard";
   const [avg, setAvg] = useState(0);
   const [userData, setUserData] = useState([]);
@@ -32,7 +33,7 @@ const Dashboardd = () => {
       hasFetched.current = true; // Prevent multiple API calls
 
       axios
-        .post("https://school-server-nine-pi.vercel.app/home", { uid, section })
+        .post("http://localhost:3000/home", { uid, section })
         .then((res) => {
           if (res.data.user) {
             const user = res.data.user;
@@ -89,7 +90,7 @@ const Dashboardd = () => {
 
 
   return (
-    <div className=" rounded-3xl">
+    <div className="rounded-3xl">
       <div className="scrollbar bg-[#F8FAFC] h-[90vh] rounded-3xl p-7 overflow-y-scroll">
         <div className="grid grid-cols-1 grid-rows-1">
           <div className="bg-gradient-to-r from-amber-300  to-yellow-500 p-5 md:text-2xl rounded-3xl">
