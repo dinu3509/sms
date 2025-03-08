@@ -22,7 +22,7 @@ const Profilee = () => {
     "DOB",
     "Blood Group",
     "Mobile Number",
-    "E-mail",
+    "Email",
     "Gender",
     "Nationality",
     "Religion",
@@ -81,7 +81,7 @@ const Profilee = () => {
   useEffect(() => {
     if (userData.length > 0) {
       const semesterValue = userData.find(
-        (item) => item.key === "semester"
+        (item) => item.key === "Semester"
       )?.value;
       if (semesterValue) {
         const updatedSemester = Number(semesterValue) - 1;
@@ -125,7 +125,7 @@ const Profilee = () => {
                 }`}
               >
                 {
-                  userData.find((item) => item.key === label.toLowerCase())
+                  userData.find((item) => item.key === (label.split(" ").join("")))
                     ?.value
                 }
                 <div className="absolute top-[-20px] left-0 text-xs">
@@ -146,8 +146,8 @@ const Profilee = () => {
                 className="border p-1 rounded-lg relative bg-gray-700"
               >
                 {
-                  userData.find((item) => item.key === label.toLowerCase())
-                    ?.value
+                  userData.find((item) => item.key === (label.split(" ").join("")))
+                  ?.value
                 }
                 <div className=" absolute top-[-20px] left-0 text-xs">
                   {label}
@@ -168,8 +168,8 @@ const Profilee = () => {
                 className="border p-1 rounded-lg relative bg-gray-700"
               >
                 {
-                  userData.find((item) => item.key === label.toLowerCase())
-                    ?.value
+                  userData.find((item) => item.key === (label.split(" ").join("")))
+                  ?.value
                 }
                 <div className=" absolute top-[-20px] left-0 text-xs">
                   {label}

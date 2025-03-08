@@ -7,7 +7,7 @@ const Alogin = () => {
     const [er1,setEr1] = useState("");
     const [er2,setEr2] = useState("");
     const navigate = useNavigate();
-    const [uid, setUid] = useState("");
+    const [fid, setFid] = useState("");
     const [password, setPassword] = useState("");
     const [captcha, setCaptcha] = useState({
       a: Math.floor(Math.random() * 9)+1,
@@ -25,14 +25,14 @@ const Alogin = () => {
       if(captcha.a + captcha.b !== parseInt(e.target[3].value)){
         setEr1("Captcha is incorrect");
       }else{setEr1("");}
-      console.log(uid, password );
+      console.log(fid, password );
   
-      axios.post("https://school-server-nine-pi.vercel.app/", {uid, password})
+      axios.post("http://localhost:3000/alogin", {fid, password})
       .then((res) => { console.log(res);
         if(res.data.message === "Success"){
             setEr2("");
             if((captcha.a + captcha.b === parseInt(e.target[3].value))){
-            navigate('/home');}else{
+            navigate('/fhome');}else{
               setEr1("Captcha is incorrect");
             }
         }else{
@@ -52,7 +52,7 @@ const Alogin = () => {
             <div className="p-2  flex flex-col text-xl gap-1 my-2">
             <label htmlFor="" className=''>Faculty ID</label>
             <input type="text" className='bg-transparent outline-0 rounded h-9  px-3 border-b py-5' 
-             onChange={(e)=>setUid(e.target.value.toUpperCase())}/>
+             onChange={(e)=>setFid(e.target.value.toUpperCase())}/>
             </div>
   
             <div className="p-2  flex flex-col text-xl gap-1 my-2">

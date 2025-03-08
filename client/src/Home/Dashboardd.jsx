@@ -2,15 +2,43 @@ import { React, useContext, useEffect, useState, useRef } from "react";
 import UserContext from "../pages/UserContext";
 import BasicDateCalendar from "../components/Calender";
 import axios from "axios";
-import { Scrollbars } from 'react-custom-scrollbars-2';
+import { Scrollbars } from "react-custom-scrollbars-2";
 
 const Dashboardd = () => {
-  
   const section = "dashboard";
-  const [avg, setAvg] = useState(0);
+  const { avg, setAvg } = useContext(UserContext);
   const [userData, setUserData] = useState([]);
   const [userData2, setUserData2] = useState([]);
+  const [userData3, setUserData3] = useState([]);
   const { uid, setUid } = useContext(UserContext);
+  const [presentCount, setPresentCount] = useState(0);
+  const [absentCount, setAbsentCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [tp, setTp] = useState(0);
+
+  useEffect(() => {
+    const todayDate = new Date().toISOString().split("T")[0]; // Get today's date in "YYYY-MM-DD" format
+    let present = 0,
+      absent = 0,
+      total = 0,
+    ttp = 0;
+
+    userData3.forEach((entry) => {
+      if (entry.value.date === todayDate) {
+        entry.value.slots.forEach((slot) => {
+          if (slot.isPresent) present++;
+          else absent++;
+        });
+      }
+      ttp += entry.value.slots?.filter((slot) => slot.isPresent).length || 0; // Count total present slots for all days
+      total += entry.value.slots?.length || 0; // Count total attendance slots for all days
+    });
+
+    setPresentCount(present);
+    setAbsentCount(absent);
+    setTotalCount(total);
+    setTp(ttp);
+  }, [userData3]);
   const hasFetched = useRef(false);
 
   useEffect(() => {
@@ -51,7 +79,19 @@ const Dashboardd = () => {
               value: user2[key],
             }));
             setUserData2(userArray2);
+            console.log(userArray2);
+
             localStorage.setItem("userData2", JSON.stringify(userArray2)); // ✅ Store in localStorage
+          }
+          if (res.data.user3) {
+            const user3 = res.data.user3;
+            const userArray3 = Object.keys(user3).map((key) => ({
+              key: key,
+              value: user3[key],
+            }));
+            console.log(userArray3);
+            setUserData3(userArray3);
+            localStorage.setItem("userData2", JSON.stringify(userArray3)); // ✅ Store in localStorage
           }
         })
         .catch((err) => console.log(err));
@@ -60,7 +100,9 @@ const Dashboardd = () => {
 
   const sem = userData.find((item) => item.key === "semester")?.value;
   const cgpaValue = userData.find((item) => item.key === "cgpa")?.value;
-  const sgpaValue = userData.find((item) => item.key === "sgpa")?.value?.[Number(sem) - 2]?.value;
+  const sgpaValue = userData.find((item) => item.key === "sgpa")?.value?.[
+    Number(sem) - 2
+  ]?.value;
 
   const grade = [
     { key: "CGPA", value: cgpaValue },
@@ -76,7 +118,9 @@ const Dashboardd = () => {
   useEffect(() => {
     if (userData2.length > 0 && sem) {
       const ab = userData2.find((item) => item.key === "semesters")?.value;
-      const semCourses = ab ? ab[5]?.courses.map((course) => course.percentage) : [];
+      const semCourses = ab
+        ? ab[5]?.courses.map((course) => course.percentage)
+        : [];
 
       if (semCourses.length > 0) {
         const average = (
@@ -86,8 +130,6 @@ const Dashboardd = () => {
       }
     }
   }, [userData2, sem]);
-
-
 
   return (
     <div className="rounded-3xl">
@@ -104,36 +146,34 @@ const Dashboardd = () => {
         <div className="h- w-full rounded-3xl flex gap-20 items-start py-3">
           <div className="grid   md:grid-cols-2 lg:grid-cols-3 md:grid-rows-2 gap-5 w-full">
             <div className="i1">
-              {" "}
               <div className="flex gap-5 bg-amber-500 p-5 rounded-3xl relative flex-col">
                 <div className="flex justify-between items-center">
-                  <div className="">Attendance</div>
-                  <div className="">
-                    {" "}
-                    <button className="border  p-1 text-xs rounded-full flex items-center justify-center">
-                      <span className="material-symbols-rounded">
-                        expand_content
-                      </span>
-                    </button>
-                  </div>
+                  <div className="text-white ">Attendance</div>
+                  <button className="border p-1 text-xs rounded-full flex items-center justify-center  ">
+                    <span className="material-symbols-rounded">
+                      expand_content
+                    </span>
+                  </button>
                 </div>
-                <hr></hr>
+                <hr className="border-gray-200" />
 
-                <div className="flex gap-5">
-                  {[{ Total: avg }, { Present: 6 }, { Absent: 1 }].map(
-                    (item, index) => {
-                      const [key, value] = Object.entries(item)[0];
-                      return (
-                        <div
-                          key={index}
-                          className="bg-[#F2F9FF] text-center w-full py-8 rounded-2xl text-black"
-                        >
-                          <div className="">{key}</div>
-                          <div className="">{value}</div>
-                        </div>
-                      );
-                    }
-                  )}
+                <div className="grid grid-cols-3 gap-5">
+                  {[
+                    { Total: (tp/totalCount *100).toFixed(2)+"%" },
+                    { Present: presentCount },
+                    { Absent: absentCount },
+                  ].map((item, index) => {
+                    const [key, value] = Object.entries(item)[0];
+                    return (
+                      <div
+                        key={index}
+                        className="bg-white text-center w-full py-8 rounded-2xl text-black shadow-md"
+                      >
+                        <div className="">{key}</div>
+                        <div className=" ">{value}</div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             </div>

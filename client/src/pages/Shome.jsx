@@ -4,6 +4,7 @@ import { NavLink } from 'react-router-dom';
 import Profilee from '../Home/Profilee';
 import Dashboardd from '../Home/Dashboardd';
 import Attendancee from '../Home/Attendancee';
+import Academic from '../Home/Academic';
 const Shome = () => {
 
 
@@ -104,7 +105,7 @@ const Dashboard = () =>  <div className=" mx-5 px-5  rounded-2xl text-white  ">
 </div>;
 
 const Attendance = () => <div className="p-5 text-white"><Attendancee></Attendancee></div>;
-const AcademicTrack = () => <div className="p-5 text-white">Academic Track Content</div>;
+const AcademicTrack = () => <div className="p-5 text-white"><Academic></Academic> </div>;
 const Fees = () => <div className="p-5 text-white">Fees Content</div>;
 const MentorDetails = () => <div className="p-5 text-white">Mentor Details Content</div>;
 const Events = () => <div className="p-5 text-white">Events Content</div>;
